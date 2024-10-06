@@ -1,69 +1,71 @@
 # Authentication System with JWT and CSRF Protection
 
-Ce projet implémente un système d'authentification sécurisé pour un tableau de bord administrateur, utilisant JSON Web Tokens (JWT) pour l'authentification des utilisateurs et des jetons CSRF (Cross-Site Request Forgery) pour une sécurité supplémentaire. Il comprend des routes pour l'inscription, la connexion et l'accès aux ressources protégées.
+This project implements a secure authentication system for an admin dashboard, using **JSON Web Tokens (JWT)** for user authentication and **CSRF (Cross-Site Request Forgery)** tokens for additional security. It includes routes for registration, login, and access to protected resources.
 
-## Prérequis
+## Prerequisites
 
-- Node.js et npm doivent être installés sur votre machine.
-- MongoDB doit être installé et configuré.
+- Node.js and npm must be installed on your machine.
+- MongoDB must be installed and running.
 
 ## Installation
 
-1. Clonez le dépôt GitHub :
+1. Clone the GitHub repository:
+
    ```bash
    git clone https://github.com/Lamiaker/Authentication-System-with-JWT-and-CSRF-Protection.git
    ```
-2. Accédez au répertoire du projet :
+
+2. Navigate to the project directory:
+
    ```bash
    cd Authentication-System-with-JWT-and-CSRF-Protection
    ```
-3. Installez les dépendances nécessaires :
+
+3. Install the required dependencies:
    ```bash
    npm install
    ```
 
-## Démarrage du serveur
+## Running the Server
 
-Pour démarrer le serveur en mode développement, exécutez la commande suivante :
+To start the server in development mode, run the following command:
 
 ```bash
 npm start
 ```
 
-Le serveur sera lancé sur `http://localhost:3000`.
+The server will run at `http://localhost:3000`.
 
-## Configuration des variables d'environnement
+## Environment Variables
 
-Créez un fichier `.env` à la racine du projet et configurez les variables suivantes :
+Create a `.env` file in the root directory and configure the following variables:
 
 ```
-JWT_SECRET=your_jwt_secret       # Clé secrète pour signer les JWT
-JWT_EXPIRES_IN=1d                # Durée d'expiration des JWT (ex: 1d pour 1 jour)
-JWT_COOKIE_EXPIRES_IN=7          # Durée d'expiration des cookies (ex: 7 jours)
-NODE_ENV=development              # Environnement (development, production)
-PORT=3000                         # Port par défaut
+JWT_SECRET=your_jwt_secret        # Secret key to sign JWT
+JWT_EXPIRES_IN=1d                 # JWT expiration time (e.g., 1d for 1 day)
+JWT_COOKIE_EXPIRES_IN=7           # Cookie expiration time (e.g., 7 days)
+NODE_ENV=development               # Environment (development, production)
+PORT=3000                          # Default port
 ```
 
 ## API Endpoints
 
-Voici les principales routes disponibles dans cette application d'authentification :
+### Authentication and User Management
 
-### Authentification et gestion des utilisateurs
+| Method | Endpoint  | Description                                     | Auth Required    |
+| ------ | --------- | ----------------------------------------------- | ---------------- |
+| POST   | `/signup` | Register a new admin user                       | No               |
+| POST   | `/login`  | Log in and receive JWT and CSRF tokens          | No               |
+| GET    | `/logout` | Log out and remove tokens                       | Yes (JWT)        |
+| GET    | `/me`     | Get the currently logged-in admin's information | Yes (JWT + CSRF) |
 
-| Méthode | Endpoint  | Description                                                       | Authentification requise |
-| ------- | --------- | ----------------------------------------------------------------- | ------------------------ |
-| `POST`  | `/signup` | Inscrire un nouvel administrateur                                 | Non                      |
-| `POST`  | `/login`  | Connexion d'un administrateur et obtenir les tokens (JWT et CSRF) | Non                      |
-| `GET`   | `/logout` | Déconnexion et suppression des tokens                             | Oui (JWT nécessaire)     |
-| `GET`   | `/me`     | Obtenir les informations de l'admin connecté                      | Oui (JWT + Jeton CSRF)   |
+### Example Usage of Endpoints
 
-### Exemple d'utilisation des routes
+#### 1. **Signup (`/signup`)**
 
-#### 1. **Inscription (`/signup`)**
-
-- **Description** : Permet d'inscrire un nouvel utilisateur administrateur.
-- **Méthode** : `POST`
-- **Corps de la requête (JSON)** :
+- **Description**: Register a new admin user.
+- **Method**: `POST`
+- **Request Body (JSON)**:
   ```json
   {
     "name": "AdminName",
@@ -73,11 +75,11 @@ Voici les principales routes disponibles dans cette application d'authentificati
   }
   ```
 
-#### 2. **Connexion (`/login`)**
+#### 2. **Login (`/login`)**
 
-- **Description** : Permet à un administrateur de se connecter et de recevoir un token JWT et un jeton CSRF.
-- **Méthode** : `POST`
-- **Corps de la requête (JSON)** :
+- **Description**: Log in as an admin and receive JWT and CSRF tokens.
+- **Method**: `POST`
+- **Request Body (JSON)**:
   ```json
   {
     "email": "admin@example.com",
@@ -85,33 +87,33 @@ Voici les principales routes disponibles dans cette application d'authentificati
   }
   ```
 
-#### 3. **Déconnexion (`/logout`)**
+#### 3. **Logout (`/logout`)**
 
-- **Description** : Permet à l'administrateur de se déconnecter et de supprimer le token JWT du cookie.
-- **Méthode** : `GET`
+- **Description**: Log out and remove JWT token from the cookie.
+- **Method**: `GET`
 
-#### 4. **Obtenir les informations de l'utilisateur connecté (`/me`)**
+#### 4. **Get Current User Info (`/me`)**
 
-- **Description** : Récupère les informations de l'administrateur connecté. Nécessite le JWT dans le cookie et un jeton CSRF.
-- **Méthode** : `GET`
-- **Requête** : Le jeton CSRF doit être envoyé dans l'en-tête ou le corps de la requête.
+- **Description**: Retrieve information of the currently logged-in admin user. Requires the JWT in the cookie and a CSRF token.
+- **Method**: `GET`
+- **Request**: The CSRF token should be sent in the request header or body.
 
-## Middleware de sécurité
+## Security Middleware
 
-### Protection CSRF
+### CSRF Protection
 
-Une fois qu'un utilisateur est connecté, un jeton CSRF est généré et envoyé dans un cookie. Ce jeton est utilisé pour protéger les routes sensibles contre les attaques de type Cross-Site Request Forgery (CSRF). Le jeton CSRF doit être inclus dans chaque requête ultérieure qui modifie l'état (POST, PUT, DELETE).
+Once a user is logged in, a CSRF token is generated and sent in a cookie. This token is used to protect sensitive routes from CSRF attacks. The CSRF token must be included in each subsequent state-changing request (POST, PUT, DELETE).
 
-### Authentification JWT
+### JWT Authentication
 
-Les routes sensibles, comme `/me`, sont protégées par JWT. Le token JWT est envoyé dans un cookie après la connexion, et ce token est vérifié à chaque fois qu'une route protégée est accédée.
+Sensitive routes such as `/me` are protected with JWT. The JWT is sent in a cookie after login, and this token is verified each time a protected route is accessed.
 
-## Exemple d'utilisation avec Postman
+## Postman Example
 
-### 1. Inscription (signup)
+### 1. Signup (Register)
 
-- URL : `POST http://localhost:3000/signup`
-- Body (raw JSON) :
+- URL: `POST http://localhost:3000/signup`
+- Body (raw JSON):
   ```json
   {
     "name": "AdminName",
@@ -121,10 +123,10 @@ Les routes sensibles, comme `/me`, sont protégées par JWT. Le token JWT est en
   }
   ```
 
-### 2. Connexion (login)
+### 2. Login
 
-- URL : `POST http://localhost:3000/login`
-- Body (raw JSON) :
+- URL: `POST http://localhost:3000/login`
+- Body (raw JSON):
   ```json
   {
     "email": "admin@example.com",
@@ -132,33 +134,33 @@ Les routes sensibles, comme `/me`, sont protégées par JWT. Le token JWT est en
   }
   ```
 
-### 3. Récupérer le jeton CSRF
+### 3. Retrieve CSRF Token
 
-Après la connexion, le serveur renverra un jeton CSRF dans un cookie `csrfToken`. Ce jeton doit être inclus dans les futures requêtes d'écriture dans les en-têtes ou dans le corps de la requête.
+After logging in, the server will return a CSRF token in a `csrfToken` cookie. This token must be included in future requests that modify the state (POST, PUT, DELETE).
 
-### 4. Accéder aux informations de l'admin connecté
+### 4. Access Logged-in Admin Info
 
-- URL : `GET http://localhost:3000/me`
-- Headers :
-  - `Authorization: Bearer <JWT_TOKEN>` (token JWT de la connexion)
-  - `csrf-token: <CSRF_TOKEN>` (jeton CSRF reçu lors de la connexion)
+- URL: `GET http://localhost:3000/me`
+- Headers:
+  - `Authorization: Bearer <JWT_TOKEN>` (JWT from login)
+  - `csrf-token: <CSRF_TOKEN>` (CSRF token received during login)
 
-## Technologies Utilisées
+## Technologies Used
 
-- **Node.js** : Environnement d'exécution JavaScript côté serveur.
-- **Express.js** : Framework minimaliste pour créer des applications web en Node.js.
-- **MongoDB** : Base de données NoSQL utilisée pour stocker les informations des administrateurs.
-- **JWT (JSON Web Token)** : Utilisé pour l'authentification sécurisée des utilisateurs.
-- **CSRF Protection** : Protéger les routes contre les attaques CSRF via le middleware `csurf`.
-- **Cookie Management** : Gestion des cookies avec `cookie-parser` pour stocker les tokens JWT et CSRF.
-
----
-
-### Instructions supplémentaires
-
-1. Si vous rencontrez des problèmes avec l'installation, assurez-vous que toutes les dépendances sont correctement installées avec `npm install`.
-2. Assurez-vous que MongoDB est correctement configuré et que le serveur est démarré avant d'exécuter l'application.
+- **Node.js**: JavaScript runtime for the server.
+- **Express.js**: Minimalist framework for web applications.
+- **MongoDB**: NoSQL database to store admin user information.
+- **JWT (JSON Web Token)**: Used for secure user authentication.
+- **CSRF Protection**: Middleware (`csurf`) to protect routes from CSRF attacks.
+- **Cookie Management**: Handles cookies using `cookie-parser` for storing JWT and CSRF tokens.
 
 ---
 
-N'oublie pas d'adapter le contenu du fichier `.env` selon ton environnement et de maintenir tes dépendances à jour. Ce projet fournit une base robuste pour un système d'authentification sécurisé.
+### Additional Notes
+
+1. If you encounter any issues during setup, make sure all dependencies are installed with `npm install`.
+2. Ensure MongoDB is properly configured and running before starting the application.
+
+---
+
+Make sure to customize the `.env` file according to your environment and keep your dependencies up to date. This project provides a robust base for a secure authentication system.
