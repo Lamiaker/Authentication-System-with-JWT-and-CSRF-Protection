@@ -112,7 +112,7 @@ Sensitive routes such as `/me` are protected with JWT. The JWT is sent in a cook
 
 ### 1. Signup (Register)
 
-- URL: `POST http://localhost:3000/signup`
+- URL: `POST http://localhost:3000/api/admin/signup`
 - Body (raw JSON):
   ```json
   {
@@ -125,7 +125,7 @@ Sensitive routes such as `/me` are protected with JWT. The JWT is sent in a cook
 
 ### 2. Login
 
-- URL: `POST http://localhost:3000/login`
+- URL: `POST http://localhost:3000/api/admin/login`
 - Body (raw JSON):
   ```json
   {
@@ -140,7 +140,7 @@ After logging in, the server will return a CSRF token in a `csrfToken` cookie. T
 
 ### 4. Access Logged-in Admin Info
 
-- URL: `GET http://localhost:3000/me`
+- URL: `GET http://localhost:3000/api/admin/me`
 - Headers:
   - `Authorization: Bearer <JWT_TOKEN>` (JWT from login)
   - `csrf-token: <CSRF_TOKEN>` (CSRF token received during login)
